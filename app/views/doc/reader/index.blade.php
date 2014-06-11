@@ -58,7 +58,27 @@
 				<div class="" ng-show="user.id > 0">
 						<a href="#" class="btn btn-default doc-support" ng-click="support(true, $event)" ng-class="{'btn-success': supported}">Support This Document</a>
 						<a href="#" class="btn btn-default doc-oppose" ng-click="support(false, $event)" ng-class="{'btn-danger': opposed}">Oppose This Document</a>
+						@if($doc->id === 3)
+							<a href="http://dc.granicus.com/MediaPlayer.php?publish_id=3" target="_blank" class="btn btn-danger" style="position:relative; bottom:0;">Watch Live</a>
+						@endif
 				</div>
+				@if($doc->id === 3)
+				<style>
+					a{
+						color:#2e74bc;
+					}
+				</style>
+				<div class="sponsor-intro" style="margin-top:20px;">
+					<p>Submit your questions on this bill for the <a style="color:#2e74bc" href="http://dccouncil.us/committees/committee-on-finance-and-revenue" target="_blank">DC Council Committee on Finance and Revenue</a> to consider live during their June 12, 2014 legislative hearing on the {{ $doc->title }}.  Your questions go directly to DC Council Member David Grosso, who will get them answered before, during, and after tomorrow's event.</p>
+					<p><strong>How to Participate</strong></p>
+					<ol>
+						<li><a href="{{ URL::to('user/signup') }}">Sign up</a> and <a href="{{ URL::to('user/login') }}">log in</a></li>
+						<li>Read the legislation then add your feedback to the bill</li>
+						<li><a href="http://dc.granicus.com/MediaPlayer.php?publish_id=3" target="_blank">Launch the DC Council webcast</a> as 11am on June 12 to join the real-time hearing.</li>
+					</ol>
+
+				</div>
+				@endif
 			</div>
 		</div>
 	</div>
