@@ -1,11 +1,16 @@
-<div class="logo-madison col-md-4">
-	<a class="link-home" href="{{ URL::to('/') }}">
-		<h1 class="white">Madison <span class="level">Demo</span></h1>
-	</a>
+<div class="navbar-header ">
+  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+  <a class="brand logo-madison navbar-brand link-home" href="{{ URL::to('/') }}">
+  	Madison <span class="level">Demo</span>
+  </a>
 </div>
-<div class="nav nav-main col-md-4 col-md-offset-4">
-
-	<ul>
+<div class="nav nav-main navbar-collapse collapse">
+	<ul class="nav navbar-nav navbar-right">
 		<li class="link-about"><a href="{{ URL::to('about') }}">About</a></li>
 		<li class="link-faq"><a href="{{ URL::to('faq') }}">FAQ</a></li>	
 		<li class="link-support"><a href="https://rally.org/opengovfoundation" target="_blank">Donate</a></li>	
@@ -27,7 +32,4 @@
 			<li class="link-signup"><a href="{{ URL::to('user/signup') }}">Sign Up</a></li>
 		@endif
 	</ul>
-
-</div>
-
-
+</div><!--/.navbar-collapse -->
