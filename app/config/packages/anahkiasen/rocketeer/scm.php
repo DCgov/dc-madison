@@ -8,7 +8,7 @@
 
 	// The SSH/HTTPS address to your repository
 	// Example: https://github.com/vendor/website.git
-	'repository' => 'https://github.com/opengovfoundation/madison.git',
+	'repository' => 'https://github.com/opengovfoundation/dc-madison.git',
 
 	// The repository credentials : you can leave those empty
 	// if you're using SSH or if your repository is public
