@@ -61,6 +61,9 @@
 						@if($doc->id == 3)
 							<a href="http://dc.granicus.com/MediaPlayer.php?publish_id=3" target="_blank" class="btn btn-danger" style="position:relative; bottom:0;">Watch Live</a>
 						@endif
+						@if($doc->id == 13 || $doc->id == 14 || $doc->id == 16)
+							<a href="http://dc.granicus.com/MediaPlayer.php?publish_id=4" target="_blank" class="btn btn-danger" style="position:relative; bottom:0;">Watch Live</a>
+						@endif
 				</div>
 				@if($doc->id == 3)
 				<style>
