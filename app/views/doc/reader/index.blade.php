@@ -59,7 +59,7 @@
 						<a id="doc-support" href="#" class="btn btn-default doc-support" ng-click="support(true, $event)" ng-class="{'btn-success': supported}">Support This Document</a>
 						<a id="doc-oppose" href="#" class="btn btn-default doc-oppose" ng-click="support(false, $event)" ng-class="{'btn-danger': opposed}">Oppose This Document</a>
 						@if($doc->id == 3)
-							<a href="http://dc.granicus.com/MediaPlayer.php?publish_id=3" target="_blank" class="btn btn-danger" style="position:relative; bottom:0;">Watch Live</a>
+							<a href="https://www.youtube.com/watch?v=I9U2Ybmt-bo" target="_blank" class="btn btn-danger" style="position:relative; bottom:0;">Hearing Video</a>
 						@endif
 						@if($doc->id == 13 || $doc->id == 14 || $doc->id == 16)
 							<a href="http://dc.granicus.com/MediaPlayer.php?publish_id=4" target="_blank" class="btn btn-danger" style="position:relative; bottom:0;">Watch Live</a>
