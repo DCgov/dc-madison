@@ -11,4 +11,4 @@
 <p><em>Non-Profit Exemptions</em></p>
 <p>OpenGov is not for profit and organized under section 501(c)3 of the U.S. Internal Revenue Code.  That means we must comply with certain U.S. Government policies <a href="http://www.irs.gov/Charities-&-Non-Profits/Charitable-Organizations/Exemption-Requirements-Section-501(c)(3)-Organizations" target="_blank">helpfully explained here by the U.S. Internal Revenue Service</a> and <a href="http://en.wikipedia.org/wiki/501(c)_organization#501.28c.29.283.29" target="_blank">here by Wikipedians</a>.  One policy is a prohibition on advocating for or against candidates for public office.  We will make a good faith effort to ensure content on OpenGov websites is compliant.  </p>
 <p>Please email questions, comments or concerns about OpenGov compliance to sayhello@opengovfoundation.org</p>
-<p><em></em></p>
+<p><em>Last Updated January 22, 2014</em></p>
