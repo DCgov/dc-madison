@@ -45,10 +45,10 @@ class PageController extends BaseController
 
 	public function privacyPolicy(){
 		$data = array(
-			'page_id'	=> 'privacy_policy',
+			'page_id'	=> 'privacy',
 			'page_title'	=> 'Privacy Policy'
 		);
 
-		return View::make('page.privacy', $data);
+		return View::make('page.index', $data);
 	}
 }
