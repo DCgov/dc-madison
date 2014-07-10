@@ -42,7 +42,9 @@ Route::put('groups/invite/{groupId}', 'GroupsController@processMemberInvite');
 //Static Pages
 Route::get('about', 'PageController@getAbout');
 Route::get('faq', 'PageController@faq');
+Route::get('privacy-policy', 'PageController@privacyPolicy');
 Route::get('/', array('as' => 'home', 'uses' => 'PageController@home'));
+
 
 //Document Routes
 Route::get('docs/search', 'DocController@getSearch');
