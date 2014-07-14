@@ -5,6 +5,7 @@
 
 use Illuminate\Auth\UserInterface;
 use Illuminate\Auth\Reminders\RemindableInterface;
+use Illuminate\Database\Eloquent\Collection;
 
 class User extends Eloquent implements UserInterface, RemindableInterface{
 	
@@ -25,6 +26,21 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 
 	public function docs(){
 		return $this->belongsToMany('Doc');
+	}
+
+	public function activeGroup() 
+	{
+		$activeGroupId = Session::get('activeGroupId');
+		
+		if($activeGroupId <= 0) {
+			return new Group();
+		}
+		
+		return Group::where('id', '=', $activeGroupId)->first();
+	}
+	
+	public function groups() {
+		return $this->belongsToMany('Group', 'group_members');
 	}
 
 	public function comments(){
@@ -60,6 +76,32 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 		return $this->hasMany('UserMeta');
 	}
 
+	public function getSponsorStatus(){
+		return $this->user_meta()->where('meta_key', '=', UserMeta::TYPE_INDEPENDENT_SPONSOR)->first();
+	}
+
+	public function setIndependentAuthor($bool)
+	{
+		if($bool) {
+			DB::transaction(function() {
+				$metaKey = UserMeta::where('user_id', '=', $this->id)
+							       ->where('meta_key', '=', UserMeta::TYPE_INDEPENDENT_SPONSOR)
+								   ->first();
+				
+				if(!$metaKey) {
+					$metakey = new UserMeta();
+					$metaKey->user_id = $this->id;
+					$metaKey->meta_key = 'independent_author';
+				}
+				
+				$metaKey->meta_value = $bool ? 1 : 0;
+				$metaKey->save();
+				
+				
+			});
+		}
+	}
+	
 	public function admin_contact($setting = null){
 
 		if(isset($setting)){
@@ -96,6 +138,36 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 
 	public function doc_meta(){
 		return $this->hasMany('DocMeta');
+	}
+	
+	public function getValidSponsors()
+	{
+		$collection = new Collection();
+		
+		$groups = GroupMember::where('user_id', '=', $this->id)
+						     ->whereIn('role', array(Group::ROLE_EDITOR, Group::ROLE_OWNER))
+						     ->get();
+		
+		foreach($groups as $groupMember) {
+			
+			$collection->add($groupMember->group()->first());
+		}
+		
+		$users = UserMeta::where('user_id', '=', $this->id)
+		                  ->where('meta_key', '=', UserMeta::TYPE_INDEPENDENT_SPONSOR)
+		                  ->where('meta_value', '=', '1')
+		                  ->get();
+		
+		foreach($users as $userMeta) {
+			$collection->add($userMeta->user()->first());
+		}
+
+		return $collection;
+	}
+	
+	static public function findByRoleName($role) 
+	{
+		return Role::where('name', '=', $role)->first()->users()->get();
 	}
 }
 

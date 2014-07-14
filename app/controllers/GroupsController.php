@@ -42,7 +42,15 @@ class GroupsController extends Controller
 		$newMember->role = $role;
 		
 		$newMember->save();
-		
+		$text = "You've been added to the group " . $group->getDisplayName() . " with the role of " . $role . ".";
+
+		// Notify member of invite
+		Mail::queue('email.notification', array('text'=>$text), function ($message) use ($email) {
+    		$message->subject("You've been added to a Madison group");
+    		$message->from('sayhello@opengovfoundation.org', 'Madison');
+    		$message->to($email);
+		});
+
 		return Redirect::to('groups/members/' . (int)$group->id)
 						->with('success_message', 'User added successfully!');
 	}
@@ -93,6 +101,32 @@ class GroupsController extends Controller
 		$member->delete();
 		
 		return Redirect::to('groups/members/' . (int)$group->id)->with('success_message', 'Member removed');
+	}
+	
+	public function setActiveGroup($groupId)
+	{
+		try {
+			
+			if(!Auth::check()) {
+				return Redirect::back()->with('error', 'You must be logged in to set a group');
+			}
+			
+			if($groupId == 0) {
+				Session::remove('activeGroupId');
+				return Redirect::back()->with('message', 'Active Group has been removed');
+			}
+			
+			if(!Group::isValidUserForGroup(Auth::user()->id, $groupId)) {
+				return Redirect::back()->with('error', 'Invalid Group');
+			}
+			
+			Session::put('activeGroupId', $groupId);
+			
+			return Redirect::back()->with('message', "Active Group Changed");
+			
+		} catch(\Exception $e) {
+			return Redirect::back()->with('error', 'There was an error processing your request');
+		}
 	}
 	
 	public function changeMemberRole($memberId)
@@ -188,7 +222,6 @@ class GroupsController extends Controller
 				return Redirect::back()->with('error', 'You cannot edit the group you are not the owner');
 			}
 		}
-		
 		return View::make('groups.edit.index', compact('group'));
 	}
 	

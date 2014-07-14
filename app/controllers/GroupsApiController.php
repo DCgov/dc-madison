@@ -13,7 +13,7 @@ class GroupsApiController extends ApiController
 	{
 		$this->beforeFilter('admin');
 		
-		$groups = Group::where('status', '!=', Group::STATUS_ACTIVE)->get();
+		$groups = Group::all();
 		
 		return Response::json($groups);
 	}
@@ -26,7 +26,7 @@ class GroupsApiController extends ApiController
 		$status = Input::get('status');
 		
 		if(!Group::isValidStatus($status)) {
-			throw new \Exception("Invalid value for veirfy request");
+			throw new \Exception("Invalid value for verify request");
 		}
 		
 		$group = Group::where('id', '=', $request['id'])->first();
@@ -37,6 +37,19 @@ class GroupsApiController extends ApiController
 		
 		$group->status = $status;
 		
-		return Response::json($group->save());
+		DB::transaction(function() use ($group) {
+			$group->save();
+			
+			switch($group->status) {
+				case Group::STATUS_ACTIVE:
+					$group->createRbacRules();
+					break;
+				case Group::STATUS_PENDING:
+					$group->destroyRbacRules();
+					break;
+			}
+		});
+		
+		return Response::json($group);
 	}
 }

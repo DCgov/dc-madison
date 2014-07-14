@@ -51,21 +51,22 @@ class UserController extends BaseController{
 		$fname = Input::get('fname');
 		$lname = Input::get('lname');
 		$url = Input::get('url');
-		$location = Input::get('location');
+		$phone = Input::get('phone');
 		$verify = Input::get('verify');
 
 		$user_details = Input::all();
-
-		if(Auth::user()->email != $email){
+		
+		if(Auth::user()->email != $email) {
 			$rules = array(
 				'fname'		=> 'required',
 				'lname'		=> 'required',
 				'email'		=> 'required|unique:users'
 			);
-		}else{
+		} else {
 			$rules = array(
 				'fname'		=> 'required',
-				'lname'		=> 'required'
+				'lname'		=> 'required',
+				'phone'		=> 'required'
 			);
 		}
 		
@@ -80,7 +81,7 @@ class UserController extends BaseController{
 		$user->fname = $fname;
 		$user->lname = $lname;
 		$user->url = $url;
-		$user->location = $location;
+		$user->phone = $phone;
 		$user->save();
 
 		if(isset($verify)){
@@ -125,8 +126,9 @@ class UserController extends BaseController{
 		$email = Input::get('email');
 		$password = Input::get('password');
 		$previous_page = Input::get('previous_page');
+		$remember = Input::get('remember');
 		$user_details = Input::all();
-		
+
 		//Rules for login form submission
 		$rules = array('email' => 'required', 'password' => 'required');
 		$validation = Validator::make($user_details, $rules);
@@ -151,11 +153,11 @@ class UserController extends BaseController{
 		//Attempt to log user in
 		$credentials = array('email' => $email, 'password' => $password);
 		
-		if(Auth::attempt($credentials)){
+		if(Auth::attempt($credentials, ($remember == 'true') ? true : false)){
 			if(isset($previous_page)){
-				return Redirect::to($previous_page);	
+				return Redirect::to($previous_page)->with('message', 'You have been successfully logged in.');	
 			}else{
-				return Redirect::to('/docs/');
+				return Redirect::to('/docs/')->with('message', 'You have been successfully logged in.');
 			}
 		}
 		else{

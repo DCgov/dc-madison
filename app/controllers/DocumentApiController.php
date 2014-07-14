@@ -38,7 +38,12 @@ class DocumentApiController extends ApiController{
 		$return_docs = array();
 
 		foreach($docs as $doc){
-			$doc->setActionCount();
+			try { 
+				$doc->setActionCount();
+			} catch(Exception $e) {
+				throw $e;
+			}
+			
 			$return_doc = $doc->toArray();
 
 			$return_doc['updated_at'] = date('c', strtotime($return_doc['updated_at']));
@@ -111,20 +116,36 @@ class DocumentApiController extends ApiController{
 		$doc = Doc::find($doc);
 		$sponsor = $doc->sponsor()->first();
 
+		$sponsor->sponsorType = get_class($sponsor);
+
 		return Response::json($sponsor);
 	}
 
 	public function postSponsor($doc){
 		$sponsor = Input::get('sponsor');
+
 		$doc = Doc::find($doc);
 		$response = null;
 
 		if(!isset($sponsor)){
 			$doc->sponsor()->sync(array());
 		}else{
-			$user = User::find($sponsor['id']);
-			$doc->sponsor()->sync(array($user->id));
-			$response = $user;
+			switch($sponsor['type']){
+				case 'user':
+					$user = User::find($sponsor['id']);
+					$doc->userSponsor()->sync(array($user->id));
+					$doc->groupSponsor()->sync(array());
+					$response = $user;
+					break;
+				case 'group':
+					$group = Group::find($sponsor['id']);
+					$doc->groupSponsor()->sync(array($group->id));
+					$doc->userSponsor()->sync(array());
+					$response = $group;
+					break;
+				default:
+					throw new Exception('Unknown sponsor type ' . $type);
+			}
 		}
 
 		return Response::json($response);
@@ -217,6 +238,49 @@ class DocumentApiController extends ApiController{
 		return Response::json($date);
 	}
 
+	public function getAllSponsorsForUser()
+	{
+		$retval = array(
+			'success' => false,
+			'sponsors' => array(),
+			'message' => ""
+		);
+		
+		if(!Auth::check()) {
+			$retval['message'] = "You must be logged in to perform this call";
+			return Response::json($retval);
+		}
+		
+		$sponsors = Auth::user()->getValidSponsors();
+		
+		foreach($sponsors as $sponsor) {
+			
+			switch(true) {
+				case ($sponsor instanceof User):
+					$userSponsor = $sponsor->toArray();
+					$userSponsor['sponsorType'] = 'user';
+					
+					$retval['sponsors'][] = $userSponsor;
+					
+					break;
+				case ($sponsor instanceof Group):
+					
+					$groupSponsor = $sponsor->toArray();
+					$groupSponsor['sponsorType'] = 'group';
+					
+					$retval['sponsors'][] = $groupSponsor;
+					break;
+				default:
+					break;
+			}
+			
+		}
+		
+		$retval['success'] = true;
+		
+		return Response::json($retval);
+	}
+	
 	public function getAllSponsors(){
 		$doc = Doc::with('sponsor')->first();
 		$sponsors = $doc->sponsor;

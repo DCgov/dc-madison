@@ -1,4 +1,5 @@
 <?php
+use Illuminate\Database\Eloquent\Collection;
 class Doc extends Eloquent{
 	public static $timestamp = true;
 	
@@ -7,44 +8,237 @@ class Doc extends Eloquent{
 
 	const TYPE = 'doc';
 
-	public function __construct(){
+	const SPONSOR_TYPE_INDIVIDUAL = "individual";
+	const SPONSOR_TYPE_GROUP = "group";
+	
+	public function __construct()
+	{
 		parent::__construct();
 
 		$this->index = Config::get('elasticsearch.annotationIndex');
 	}
 
-	public function dates(){
+	public function dates()
+	{
 		return $this->hasMany('Date');
 	}
 
-	public function sponsor(){
+	public function canUserEdit($user)
+	{
+		$sponsor = $this->sponsor()->first();
+		
+		if($user->hasRole('Admin')){
+			return true;
+		}
+
+		switch(true) {
+			case $sponsor instanceof User:
+				return $sponsor->hasRole('Independent Sponsor');
+				break;
+			case $sponsor instanceof Group:
+				return $sponsor->userHasRole($user, Group::ROLE_EDITOR) || $sponsor->userHasRole($user, Group::ROLE_OWNER);
+				break;
+			default:
+				throw new \Exception("Unknown Sponsor Type");
+		}
+		
+		return false;
+	}
+	
+	public function sponsor()
+	{
+		$sponsor = $this->belongsToMany('Group')->first();
+
+		if(!$sponsor) {
+		 	return $this->belongsToMany('User');
+		}
+		
+		return $this->belongsToMany('Group'); 
+	}
+	
+	public function userSponsor()
+	{
 		return $this->belongsToMany('User');
 	}
+	
+	public function groupSponsor()
+	{
+		return $this->belongsToMany('Group');
+	}
 
-	public function statuses(){
+	public function statuses()
+	{
 		return $this->belongsToMany('Status');
 	}
 
-	public function categories(){
+	public function categories()
+	{
 		return $this->belongsToMany('Category');
 	}
 
-	public function comments(){
+	public function comments()
+	{
 		return $this->hasMany('Comment');
 	}
 
-	public function getLink(){
+	public function getLink()
+	{
 		return URL::to('doc/' . $this->slug);
 	}
 
-	public function content(){
+	public function content()
+	{
 		return $this->hasOne('DocContent');
 	}
 
-	public function doc_meta(){
+	public function doc_meta()
+	{
 		return $this->hasMany('DocMeta');
 	}
 
+	static public function createEmptyDocument(array $params)
+	{
+		$defaults = array(
+			'content' => "New Document Content",
+			'sponsor' => null,
+			'sponsorType' => null
+		);
+		
+		$params = array_replace_recursive($defaults, $params);
+		
+		if(is_null($params['sponsor'])) {
+			throw new \Exception("Sponsor Param Required");
+		}
+		
+		$document = new Doc();
+		
+		DB::transaction(function() use ($document, $params) {
+			$document->title = $params['title'];
+			$document->save();
+				
+			switch($params['sponsorType']) {
+				case static::SPONSOR_TYPE_INDIVIDUAL:
+					$document->userSponsor()->sync(array($params['sponsor']));
+					break;
+				case static::SPONSOR_TYPE_GROUP:
+					$document->groupSponsor()->sync(array($params['sponsor']));
+					break;
+				default:
+					throw new \Exception("Invalid Sponsor Type");
+			}
+			
+			$template = new DocContent();
+			$template->doc_id = $document->id;
+			$template->content = "New Document Content";
+			$template->save();
+				
+			$document->init_section = $template->id;
+			$document->save();
+		});
+		
+		return $document;
+	}
+	
+	public function save(array $options = array())
+	{
+		if(empty($this->slug)) {
+			$this->slug = $this->getSlug();
+		}
+		
+		return parent::save($options);
+	}
+	
+	public function getSlug()
+	{
+		if(empty($this->title)) {
+			throw new Exception("Can't get a slug - empty title");
+		}
+		
+		return str_replace(
+					array(' ', '.', ','),
+					array('-', '', ''),
+					strtolower($this->title));
+	}
+	
+	static public function allOwnedBy($userId)
+	{
+		$rawDocs = DB::select(
+			DB::raw(
+				"SELECT docs.* FROM
+					(SELECT doc_id 
+					   FROM doc_group, group_members
+					  WHERE doc_group.group_id = group_members.group_id
+					    AND group_members.user_id = ?
+					UNION ALL
+					 SELECT doc_id 
+					   FROM doc_user
+					  WHERE doc_user.user_id = ?
+				    ) DocUnion, docs
+				  WHERE docs.id = DocUnion.doc_id
+			   GROUP BY docs.id"
+			),
+			array($userId, $userId)
+		);
+		
+		$results = new Collection();
+		
+		foreach($rawDocs as $row) {
+			$obj = new static();
+			
+			foreach($row as $key => $val) {
+				$obj->$key = $val;
+			}
+			
+			$results->add($obj);
+		}
+		
+		return $results;
+	}
+	
+	static public function getAllValidSponsors()
+	{
+		$userMeta = UserMeta::where('meta_key', '=', UserMeta::TYPE_INDEPENDENT_SPONSOR)
+							->where('meta_value', '=', 1)
+							->get();
+		
+		$groups = Group::where('status', '=', Group::STATUS_ACTIVE)
+						->get();
+		
+		$results = new Collection();
+		
+		$userIds = array();
+		
+		foreach($userMeta as $m) {
+			$userIds[] = $m->user_id;
+		}
+		
+		if(!empty($userIds)) {
+			$users = User::whereIn('id', $userIds)->get();
+		
+			foreach($users as $user) {
+				$row = array(
+						'display_name' => "{$user->fname} {$user->lname}",
+						'sponsor_type' => 'individual',
+						'id' => $user->id
+				);
+					
+				$results->add($row);
+			}
+		}
+		
+		foreach($groups as $group) {
+			$row = array(
+					'display_name' => $group->display_name,
+					'sponsor_type' => 'group',
+					'id' => $group->id
+			);
+				
+			$results->add($row);
+		}
+		
+		return $results;
+	}
+	
 	public function setActionCount(){
 		$es = self::esConnect();
 
@@ -77,7 +271,8 @@ class Doc extends Eloquent{
 		return $path;
 	}
 
-	public function store_content($doc, $doc_content){		
+	public function indexContent($doc_content)
+	{
 		$es = self::esConnect();
 
 		File::put($this->get_file_path('markdown'), $doc_content->content);

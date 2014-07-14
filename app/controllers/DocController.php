@@ -29,8 +29,8 @@ class DocController extends BaseController{
 		try{
 			
 			//Retrieve requested document
-			$doc = Doc::where('slug', $slug)->with('statuses')->with('sponsor')->with('categories')->with('dates')->first();
-			
+			$doc = Doc::where('slug', $slug)->with('statuses')->with('userSponsor')->with('groupSponsor')->with('categories')->with('dates')->first();
+
 			if(!isset($doc)){
 				App::abort('404');
 			}
@@ -63,7 +63,7 @@ class DocController extends BaseController{
 			return View::make('doc.reader.index', $data);
 						
 		}catch(Exception $e){
-			return Redirect::to('docs')->with('error', $e->getMessage());
+			return Redirect::to('/')->with('error', $e->getMessage());
 		}
 		App::abort('404');
 	}

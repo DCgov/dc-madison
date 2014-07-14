@@ -1,4 +1,7 @@
 <?php
+
+use Illuminate\Database\Eloquent\Collection;
+
 /**
  * 	Controller for admin dashboard
  */
@@ -27,131 +30,7 @@ class DashboardController extends BaseController{
 
 		return View::make('dashboard.index', $data);
 	}
-
-	/**
-	 * 	Document Creation/List or Document Edit Views
-	 */
-	public function getDocs($id = ''){
-		
-		$user = Auth::user();
-		
-		if(!$user->can('admin_manage_documents')) {
-			return Redirect::to('/dashboard')->with('message', "You do not have permission");
-		}
-		
-		if($id == ''){
-			$docs = Doc::all();
-
-			$data = array(
-				'page_id'		=> 'doc_list',
-				'page_title'	=> 'Edit Documents',
-				'docs'			=> $docs
-			);
-
-			return View::make('dashboard.docs', $data);
-		}
-		else{
-			$doc = Doc::find($id);
-			if(isset($doc)){
-				$data = array(
-					'page_id'		=> 'edit_doc',
-					'page_title'	=> 'Edit ' . $doc->title,
-					'doc'			=> $doc,
-					// Just get the first content element.  We only have one, now.
-					'contentItem' => $doc->content()->where('parent_id')->first()
-				);
-
-				return View::make('dashboard.edit-doc', $data);
-			}
-			else{
-				return Response::error('404');
-			}
-		}
-	}
 	
-	/**
-	 * 	Post route for creating / updating documents
-	 */
-	public function postDocs($id = ''){
-		
-		$user = Auth::user();
-		
-		if(!$user->can('admin_manage_documents')) {
-			return Redirect::to('/dashboard')->with('message', "You do not have permission");
-		}
-		
-		//Creating new document
-		if($id == ''){
-			$title = Input::get('title');
-			$slug = str_replace(array(' ', '.'),array('-', ''), strtolower($title));
-			$doc_details = Input::all();
-
-			$rules = array('title' => 'required');
-			$validation = Validator::make($doc_details, $rules);
-			if($validation->fails()){
-				die($validation);
-				return Redirect::to('dashboard/docs')->withInput()->withErrors($validation);
-			}
-
-			try{
-				$doc = new Doc();
-				$doc->title = $title;
-				$doc->slug = $slug;
-				$doc->save();
-				$doc->sponsor()->sync(array($user->id));
-				
-				$starter = new DocContent();
-				$starter->doc_id = $doc->id;
-				$starter->content = "New Doc Content";
-				$starter->save();
-
-				$doc->init_section = $starter->id;
-				$doc->save();
-
-				return Redirect::to('dashboard/docs/' . $doc->id)->with('success_message', 'Document created successfully');
-			}catch(Exception $e){
-				return Redirect::to('dashboard/docs')->withInput()->with('error', $e->getMessage());
-			}
-		}
-		else{
-			return Response::error('404');
-		}
-	}
-
-	/**
-	 * 	PUT route for saving documents
-	 */
-	public function putDocs($id = ''){
-		
-		$user = Auth::user();
-		
-		if(!$user->can('admin_manage_documents')) {
-			return Redirect::to('/dashboard')->with('message', "You do not have permission");
-		}
-		
-		$content = Input::get('content');
-		$content_id = Input::get('content_id');
-
-		if($content_id){
-			try{
-				$doc_content = DocContent::find($content_id);
-			}catch (Exception $e){
-				return Redirect::to('dashboard/docs/' . $id)->with('error', 'Error saving the document: ' . $e->getMessage());
-			}
-		}
-		else{
-			$doc_content = new DocContent();
-		}
-
-		$doc_content->doc_id = $id;
-		$doc_content->content = $content;
-		$doc_content->save();
-
-		$doc = Doc::find($id);
-		$doc->store_content($doc, $doc_content);
-
-		return Redirect::to('dashboard/docs/' . $id)->with('success_message', 'Document Saved Successfully');
-	}
 	
 	public function getGroupverifications() 
 	{
@@ -162,7 +41,7 @@ class DashboardController extends BaseController{
 		}
 		
 		$groups = Group::where('status', '!=', Group::STATUS_ACTIVE)->get();
-		
+
 		$data = array(
 			'page_id' => 'verify_groups',
 			'page_title' => 'Verify Groups',
@@ -170,6 +49,34 @@ class DashboardController extends BaseController{
 		);
 		
 		return View::make('dashboard.verify-group', $data);
+	}
+	
+	public function getUserverifications()
+	{
+		$user = Auth::user();
+	
+		if(!$user->can('admin_verify_users')) {
+			return Redirect::to('/dashboard')->with('message', "You do not have permission");
+		}
+		
+		$users = UserMeta::where('meta_key', '=', UserMeta::TYPE_INDEPENDENT_SPONSOR)
+						 ->where('meta_value', '=', '0')
+						 ->get();
+		
+		$userResults = new Collection();
+		
+		foreach($users as $userMeta) {
+			$userObj = $userMeta->user()->first();
+			$userResults->add($userObj);
+		}
+		
+		$data = array(
+			'page_id' => 'verify_user_sponsor',
+			'page_title' => 'Verify Independent Sponsors',
+			'requests' => $userResults
+		);
+	
+		return View::make('dashboard.verify-independent', $data);
 	}
 	
 	/**
@@ -228,6 +135,131 @@ class DashboardController extends BaseController{
 		if(!isset($adminContact)){
 			return Redirect::back()->with('error', 'The admin account with this email was not found.  Please try a different email.');
 		}
+	}
+	
+	/**
+	 * 	Document Creation/List or Document Edit Views
+	 */
+	public function getDocs($id = ''){
+	
+		$user = Auth::user();
+	
+		if(!$user->can('admin_manage_documents')) {
+			return Redirect::to('/dashboard')->with('message', "You do not have permission");
+		}
+	
+		if($id == ''){
+			$docs = Doc::all();
+	
+			$data = array(
+					'page_id'		=> 'doc_list',
+					'page_title'	=> 'Edit Documents',
+					'docs'			=> $docs
+			);
+	
+			return View::make('dashboard.docs', $data);
+		}
+		else{
+			$doc = Doc::find($id);
+			if(isset($doc)){
+				$data = array(
+						'page_id'		=> 'edit_doc',
+						'page_title'	=> 'Edit ' . $doc->title,
+						'doc'			=> $doc,
+						// Just get the first content element.  We only have one, now.
+						'contentItem' => $doc->content()->where('parent_id')->first()
+				);
+	
+				return View::make('documents.edit', $data);
+			}
+			else{
+				return Response::error('404');
+			}
+		}
+	}
+	
+	/**
+	 * 	Post route for creating / updating documents
+	 */
+	public function postDocs($id = ''){
+	
+		$user = Auth::user();
+	
+		if(!$user->can('admin_manage_documents')) {
+			return Redirect::to('/dashboard')->with('message', "You do not have permission");
+		}
+	
+		//Creating new document
+		if($id == ''){
+			$title = Input::get('title');
+			$slug = str_replace(array(' ', '.'),array('-', ''), strtolower($title));
+			$doc_details = Input::all();
+	
+			$rules = array('title' => 'required');
+			$validation = Validator::make($doc_details, $rules);
+			if($validation->fails()){
+				die($validation);
+				return Redirect::to('dashboard/docs')->withInput()->withErrors($validation);
+			}
+	
+			try{
+				$doc = new Doc();
+				$doc->title = $title;
+				$doc->slug = $slug;
+				$doc->save();
+				$doc->sponsor()->sync(array($user->id));
+	
+				$starter = new DocContent();
+				$starter->doc_id = $doc->id;
+				$starter->content = "New Doc Content";
+				$starter->save();
+	
+				$doc->init_section = $starter->id;
+				$doc->save();
+	
+				return Redirect::to('dashboard/docs/' . $doc->id)->with('success_message', 'Document created successfully');
+			}catch(Exception $e){
+				return Redirect::to('dashboard/docs')->withInput()->with('error', $e->getMessage());
+			}
+		}
+		else{
+			return Response::error('404');
+		}
+	}
+	
+	/**
+	 * 	PUT route for saving documents
+	 */
+	public function putDocs($id = ''){
+	
+		$user = Auth::user();
+	
+		if(!$user->can('admin_manage_documents')) {
+			return Redirect::to('/dashboard')->with('message', "You do not have permission");
+		}
+	
+		$content = Input::get('content');
+		$content_id = Input::get('content_id');
+	
+		if($content_id){
+			try{
+				$doc_content = DocContent::find($content_id);
+			}catch (Exception $e){
+				return Redirect::to('dashboard/docs/' . $id)->with('error', 'Error saving the document: ' . $e->getMessage());
+			}
+		}
+		else{
+			$doc_content = new DocContent();
+		}
+	
+		$doc_content->doc_id = $id;
+		$doc_content->content = $content;
+		$doc_content->save();
+	
+		$doc = Doc::find($id);
+		$doc->indexContent($doc_content);
+	
+		return Redirect::to('dashboard/docs/' . $id)->with('success_message', 'Document Saved Successfully');
 	}
 }
 

@@ -38,6 +38,7 @@ Route::get('groups/member/{memberId}/delete', 'GroupsController@removeMember');
 Route::post('groups/member/{memberId}/role', 'GroupsController@changeMemberRole');
 Route::get('groups/invite/{groupId}', 'GroupsController@inviteMember');
 Route::put('groups/invite/{groupId}', 'GroupsController@processMemberInvite');
+Route::get('groups/active/{groupId}', 'GroupsController@setActiveGroup');
 
 //Static Pages
 Route::get('about', 'PageController@getAbout');
@@ -48,9 +49,18 @@ Route::get('/', array('as' => 'home', 'uses' => 'PageController@home'));
 
 
 //Document Routes
-Route::get('docs/search', 'DocController@getSearch');
 Route::get('docs', 'DocController@index');
 Route::get('docs/{slug}', 'DocController@index');
+Route::get('documents/search', 'DocumentsController@getSearch');
+Route::get('documents', 'DocumentsController@listDocuments');
+Route::get('documents/view/{documentId}', 'DocumentsController@viewDocument');
+Route::get('documents/edit/{documentId}', 'DocumentsController@editDocument');
+Route::put('documents/edit/{documentId}', 'DocumentsController@saveDocumentEdits');
+Route::post('documents/create', 'DocumentsController@createDocument');
+Route::post('documents/save', 'DocumentsController@saveDocument');
+Route::delete('/documents/delete/{slug}', 'DocumentsController@deleteDocument');
+Route::get('/documents/sponsor/request', 'SponsorController@getRequest');
+Route::post('/documents/sponsor/request', 'SponsorController@postRequest');
 
 //User Routes
 Route::get('user/{user}', 'UserController@getIndex');
@@ -69,6 +79,10 @@ Route::get('annotation/{annotation}', 'AnnotationController@getIndex');
 Route::controller('dashboard', 'DashboardController');
 
 //Api Routes
+	// Document API Routes
+	Route::get('api/user/sponsors/all', 'DocumentApiController@getAllSponsorsForUser');
+	Route::get('api/sponsors/all', 'SponsorApiController@getAllSponsors');
+	
     //Annotation Action Routes
     Route::post('api/docs/{doc}/annotations/{annotation}/likes', 'AnnotationApiController@postLikes');
     Route::post('api/docs/{doc}/annotations/{annotation}/dislikes', 'AnnotationApiController@postDislikes');
@@ -131,6 +145,9 @@ Route::controller('dashboard', 'DashboardController');
     Route::post('api/user/verify/', 'UserApiController@postVerify');
     Route::get('api/user/admin/', 'UserApiController@getAdmins');
     Route::post('api/user/admin/', 'UserApiController@postAdmin');
+    Route::get('api/user/independent/verify/', 'UserApiController@getIndependentVerify');
+    Route::post('api/user/independent/verify/', 'UserApiController@postIndependentVerify');
+    
     
     // Group Routes
     Route::get('api/groups/verify/', 'GroupsApiController@getVerify');

@@ -1,6 +1,61 @@
 /*global Markdown*/
 /*global clean_slug*/
 angular.module('madisonApp.dashboardControllers', [])
+  .controller('DashboardVerifyGroupController', ['$scope', '$http', function($scope, $http) {
+    $scope.requests = [];
+
+    $scope.init = function(){
+        $scope.getRequests();
+    };
+
+    $scope.getRequests = function(){
+        $http.get('/api/groups/verify')
+        .success(function(data, status, headers, config){
+            $scope.requests = data;
+        })
+        .error(function(data, status, headers, config){
+            console.error(data);
+        });
+    };
+
+    $scope.update = function(request, status, event){
+        $http.post('/api/groups/verify', {'request': request, 'status': status})
+        .success(function(data){
+            request.status = status;
+        })
+        .error(function(data, status, headers, config){
+            console.error(data);
+        });
+    };
+  }])
+  .controller('DashboardVerifyUserController', ['$scope', '$http', function($scope, $http) {
+    $scope.requests = [];
+
+    $scope.init = function(){
+        $scope.getRequests();
+    };
+
+    $scope.getRequests = function(){
+        $http.get('/api/user/independent/verify')
+        .success(function(data, status, headers, config){
+            $scope.requests = data;
+        })
+        .error(function(data, status, headers, config){
+            console.error(data);
+        });
+    };
+
+    $scope.update = function(request, status, event){
+        $http.post('/api/user/independent/verify', {'request': request, 'status': status})
+        .success(function(data){
+            request.meta_value = status;
+            location.reload();
+        })
+        .error(function(data, status, headers, config){
+            console.error(data);
+        });
+    };
+  }])
   .controller('DashboardDocumentsController', ['$scope', '$http', '$filter',
     function ($scope, $http, $filter) {
       $scope.docs = [];
@@ -328,7 +383,7 @@ angular.module('madisonApp.dashboardControllers', [])
             };
           },
           initSelection: function (element, callback) {
-            callback($scope.status);
+            callback($scope.status);  
           },
           allowClear: true
         };
@@ -337,20 +392,37 @@ angular.module('madisonApp.dashboardControllers', [])
           placeholder: "Select Document Sponsor",
           allowClear: true,
           ajax: {
-            url: "/api/user/verify",
+            url: "/api/user/sponsors/all",
             dataType: 'json',
             data: function () {
               return;
             },
             results: function (data) {
               var returned = [];
-              angular.forEach(data, function (verified) {
-                var text = verified.user.fname + " " + verified.user.lname + " - " + verified.user.email;
-
-                returned.push({
-                  id: verified.user.id,
-                  text: text
-                });
+              
+              if(!data.success) {
+                  alert(data.message);
+                  return;
+              }
+              
+              angular.forEach(data.sponsors, function (sponsor) {
+                var text = "";
+                
+                switch(sponsor.sponsorType) {
+                    case 'group':
+                        text = "[Group] " + sponsor.name;
+                        break;
+                    case 'user':
+                        text = sponsor.fname + " " + sponsor.lname + " - " + sponsor.email;
+                        break;
+                } 
+                
+                returned.push({ 
+                    id : sponsor.id,
+                    type :  sponsor.sponsorType,
+                    text : text
+                }); 
+                
               });
 
               return {
@@ -488,9 +560,21 @@ angular.module('madisonApp.dashboardControllers', [])
       $scope.getDocSponsor = function () {
         return $http.get('/api/docs/' + $scope.doc.id + '/sponsor')
           .success(function (data) {
+            var text = "";
+
+            switch(data.sponsorType.toLowerCase()) {
+                case 'group':
+                    text = "[Group] " + data.name;
+                    break;
+                case 'user':
+                    text = data.fname + " " + data.lname + " - " + data.email;
+                    break;
+            }
+
             $scope.sponsor = {
-              id: data.id,
-              text: data.fname + " " + data.lname + " - " + data.email
+                id : data.id,
+                type :  data.sponsorType.toLowerCase(),
+                text : text
             };
           }).error(function (data) {
             console.error("Error getting document sponsor: %o", data);
@@ -500,7 +584,7 @@ angular.module('madisonApp.dashboardControllers', [])
       $scope.getDocStatus = function () {
         return $http.get('/api/docs/' + $scope.doc.id + '/status')
           .success(function (data) {
-            if (data.id === 'undefined') {
+            if (data.id === undefined) {
               $scope.status = null;
             } else {
               $scope.status = {
