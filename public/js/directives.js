@@ -35,12 +35,12 @@ angular.module('madisonApp.directives', []).directive('docComments', function ()
     restrict: 'A',
     templateUrl: '/templates/doc-list-item.html'
   };
-}).directive('activityItem', ['growl', function (growl) {
+}).directive('annotationItem', ['growl', function (growl) {
 
   return {
     restrict: 'A',
     transclude: true,
-    templateUrl: '/templates/activity-item.html',
+    templateUrl: '/templates/annotation-item.html',
     compile: function () {
       return {
         post: function (scope, element, attrs) {
@@ -59,18 +59,41 @@ angular.module('madisonApp.directives', []).directive('docComments', function ()
       };
     }
   };
-}]).directive('activitySubComment', ['growl', '$anchorScroll', '$timeout', function (growl, $anchorScroll, $timeout) {
+}]).directive('commentItem', ['growl', function (growl) {
+
   return {
     restrict: 'A',
     transclude: true,
-    templateUrl: '/templates/activity-sub-comment.html',
+    templateUrl: '/templates/comment-item.html',
+    compile: function () {
+      return {
+        post: function (scope, element, attrs) {
+          var commentLink = element.find('.comment-link').first();
+          var linkPath = window.location.origin + window.location.pathname + '#' + attrs.activityItemLink;
+          $(commentLink).attr('data-clipboard-text', linkPath);
+
+          var client = new ZeroClipboard(commentLink);
+
+          client.on('aftercopy', function (event) {
+            scope.$apply(function () {
+              growl.addSuccessMessage("Link copied to clipboard.");
+            });
+          });
+        }
+      };
+    }
+  };
+}]).directive('subcommentLink', ['growl', '$anchorScroll', '$timeout', function (growl, $anchorScroll, $timeout) {
+  return {
+    restrict: 'A',
+    template: '<span class="glyphicon glyphicon-link" title="Copy link to clipboard"></span>',
     compile: function () {
       return {
         pre: function () {
 
         },
         post: function (scope, element, attrs) {
-          var commentLink = element.find('.subcomment-link').first();
+          var commentLink = element;
           var linkPath = window.location.origin + window.location.pathname + '#subcomment_' + attrs.subCommentId;
 
           $(commentLink).attr('data-clipboard-text', linkPath);
@@ -89,5 +112,44 @@ angular.module('madisonApp.directives', []).directive('docComments', function ()
         }
       };
     }
+  };
+}]).directive('activitySubComment', ['growl', '$anchorScroll', '$timeout', function (growl, $anchorScroll, $timeout) {
+  return {
+    restrict: 'A',
+    transclude: true,
+    templateUrl: '/templates/activity-sub-comment.html',
+    compile: function () {
+      return {
+        pre: function () {
+
+        },
+        post: function (scope, element, attrs) {
+          var commentLink = element.find('.subcomment-link').first();
+          var linkPath = window.location.origin + window.location.pathname + '#annsubcomment_' + attrs.subCommentId;
+
+          $(commentLink).attr('data-clipboard-text', linkPath);
+
+          var client = new ZeroClipboard(commentLink);
+
+          client.on('aftercopy', function (event) {
+            scope.$apply(function () {
+              growl.addSuccessMessage("Link copied to clipboard.");
+            });
+          });
+
+          $timeout(function () {
+            $anchorScroll();
+          }, 0);
+        }
+      };
+    }
+  };
+}]).directive('socialLogin', [ function () {
+  return {
+    restrict: 'A',
+    scope: {
+      message: '@message'
+    },
+    templateUrl: '/templates/social-login.html'
   };
 }]);

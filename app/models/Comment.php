@@ -1,5 +1,6 @@
 <?php
-class Comment extends Eloquent{
+class Comment extends Eloquent implements ActivityInterface
+{
 	protected $table = 'comments';
     protected $softDelete = true;
 
@@ -56,6 +57,7 @@ class Comment extends Eloquent{
         $item['likes'] = $this->likes();
         $item['dislikes'] = $this->dislikes();
         $item['flags'] = $this->flags();
+        $item['comments'] = array();
 
         return $item;
     }
@@ -103,10 +105,41 @@ class Comment extends Eloquent{
         $obj->load('user');
 
         return $obj;
-    }    
+    }   
+
+    /**
+    *   Construct link for Comment
+    *
+    *   @param null
+    *   @return url 
+    */
+    public function getLink(){
+        $slug = DB::table('docs')->where('id', $this->doc_id)->pluck('slug');
+
+        return URL::to('docs/' . $slug . '#comment_' . $this->id);
+    }
+
+    /**
+    *   Create RSS item for Comment
+    *
+    *   @param null
+    *   @return array $item
+    */
+    public function getFeedItem(){
+        $user = $this->user()->get()->first();
+
+        $item['title'] = $user->fname . ' ' . $user->lname . "'s Comment";
+        $item['author'] = $user->fname . ' ' . $user->lname;
+        $item['link'] = $this->getLink();
+        $item['pubdate'] = $this->updated_at;
+        $item['description'] = $this->text; 
+
+        return $item;
+    }
 
     static public function loadComments($docId, $commentId, $userId){
-        $comments = static::where('doc_id', '=', $docId)->whereNull('parent_id')->with('comments')->with('user');
+        $comments = static::where('doc_id', '=', $docId)->with('user');
+
 
         if(!is_null($commentId)){
             $comments->where('id', '=', $commentId);
@@ -115,14 +148,24 @@ class Comment extends Eloquent{
         $comments = $comments->get();
 
         $retval = array();
-        foreach($comments as $comment){
-            foreach($comment->comments as $subcomment){
-                $subcomment->load('user');
-            }
+        foreach($comments as $comment) {
             $retval[] = $comment->loadArray();
         }
 
         return $retval;
     }
+
+    /**
+    *   Include link to annotation when converted to array
+    * 
+    *   @param null
+    * @return parent::toArray()
+    */
+    public function toArray(){
+        $this->link = $this->getLink();
+
+        return parent::toArray();
+    }
 }
+
 

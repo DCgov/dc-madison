@@ -79,6 +79,38 @@ class DashboardController extends BaseController{
 		return View::make('dashboard.verify-independent', $data);
 	}
 	
+	public function postNotifications()
+	{
+		$notifications = Input::get('notifications');
+		
+		if(!is_array($notifications)) {
+			return Redirect::to('/dashboard/notifications');
+		}
+		
+		Notification::where('user_id', '=', Auth::user()->id)
+					->whereIn('event', array_keys(Notification::getValidNotifications()))
+					->delete();
+					
+		foreach($notifications as $n) {
+			Notification::addNotificationForUser($n, Auth::user()->id);
+		}
+		
+		return Redirect::to('/dashboard/notifications')->with('success_message', "Your notifications have been updated");
+	}
+	
+	public function getNotifications()
+	{
+		$notifications = Notification::where('user_id', '=', Auth::user()->id)->get();
+		$validNotifications = Notification::getValidNotifications();
+		
+		$selectedNotifications = [];
+		foreach($notifications as $n) {
+			$selectedNotifications[] = $n->event;
+		}
+		
+		return View::make('dashboard.notifications', compact('selectedNotifications', 'validNotifications'));
+	}
+	
 	/**
 	 * 	Verification request view
 	 */
@@ -255,6 +287,8 @@ class DashboardController extends BaseController{
 		$doc_content->doc_id = $id;
 		$doc_content->content = $content;
 		$doc_content->save();
+
+		Event::fire(MadisonEvent::DOC_EDITED, $doc);
 	
 		$doc = Doc::find($id);
 		$doc->indexContent($doc_content);

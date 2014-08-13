@@ -6,6 +6,7 @@
 use Illuminate\Auth\UserInterface;
 use Illuminate\Auth\Reminders\RemindableInterface;
 use Illuminate\Database\Eloquent\Collection;
+use LaravelBook\Ardent\Ardent;
 
 class User extends Eloquent implements UserInterface, RemindableInterface{
 	
@@ -13,6 +14,19 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 	protected $hidden = array('password', 'token', 'last_login', 'updated_at');
 	//protected $fillable = array('id', 'email', 'fname', 'lname', 'user_level');
 	protected $softDelete = true;
+
+	/**
+	*	Ardent validation rules
+	*/
+	public static $rules = array(
+		'fname' => 'required',
+		'lname' => 'required'
+	);
+
+	public static $customMessages = array(
+		'fname.required' => 'The first name field is required.',
+		'lname.required' => 'The last name field is required.'
+	);
 
 	public function verified(){
 		$request = $this->user_meta()->where('meta_key', 'verify')->first();
@@ -22,6 +36,11 @@ class User extends Eloquent implements UserInterface, RemindableInterface{
 		}else{
 			return null;
 		}
+	}
+	
+	public function getDisplayName()
+	{
+		return "{$this->fname} {$this->lname}";
 	}
 
 	public function docs(){

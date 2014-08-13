@@ -28,6 +28,9 @@
 
 				$task->command->info('Linking ' . $homeFolder . '/creds.yml -> current/app/config/creds.yml');
 				$cred_ret = $task->runInFolder('/', 'ln -s ' . $homeFolder . '/creds.yml current/app/config/creds.yml');
+
+				$task->command->info('Linking ' . $homeFolder . '/oauth_creds.yml -> current/app/config/oauth_creds.yml');
+				$cred_ret = $task->runInFolder('/', 'ln -s ' . $homeFolder . '/oauth_creds.yml current/app/config/oauth_creds.yml');
 				
 				$task->command->info('Linking ' . $homeFolder . '/smtp.yml -> current/app/config/creds.yml');
 				$smtp_ret = $task->runInFolder('/', 'ln -s ' . $homeFolder . '/smtp.yml current/app/config/smtp.yml');
@@ -43,6 +46,9 @@
 
 				$task->command->info('Running Migrations');
 				$task->runForCurrentRelease('php artisan migrate');
+
+				$task->command->info('Running Bower Install');
+				$task->runForCurrentRelease('bower install');
 			}
 		),
 		'cleanup' => array(),

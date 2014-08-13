@@ -39,28 +39,31 @@ module.exports = function (grunt) {
             'public/vendor/select2/select2.js',
             'public/vendor/underscore.min.js',
             'public/bower_components/google-diff-match-patch-js/diff_match_patch.js',
-            'node_modules/angular/lib/angular.min.js',
-            'node_modules/angular-bootstrap/ui-bootstrap.js',
-            'node_modules/angular-animate/angular-animate.min.js',
+            'public/bower_components/angular/angular.min.js',
+            'public/bower_components/angular-animate/angular-animate.min.js',
+            'public/bower_components/angular-bootstrap/ui-bootstrap.min.js',
+            'public/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js',
             'public/bower_components/angular-cookies/angular-cookies.js',
             'public/bower_components/angular-ui/build/angular-ui.min.js',
             'public/bower_components/zeroclipboard/dist/ZeroClipboard.min.js',
             'public/bower_components/angular-growl/build/angular-growl.min.js',
-	    'public/bower_components/angular-sanitize/angular-sanitize.js',
-            'node_modules/twitter-bootstrap-3.0.0/dist/js/bootstrap.min.js',
+            'public/bower_components/angular-sanitize/angular-sanitize.js',
+            'public/bower_components/angular-resource/angular-resource.min.js',
+            'public/bower_components/bootstrap/dist/js/bootstrap.min.js',
 
             //Datetimepicker and dependencies
             'public/vendor/datetimepicker/datetimepicker.js',
             'public/bower_components/moment/min/moment.min.js',
-
             'public/bower_components/angular-bootstrap-datetimepicker/src/js/datetimepicker.js',
             'public/js/controllers.js',
+            'public/js/resources.js',
             'public/js/dashboardControllers.js',
             'public/js/services.js',
             'public/js/directives.js',
             'public/js/filters.js',
             'public/js/annotationServiceGlobal.js',
-            'public/js/app.js'
+            'public/js/app.js',
+            'public/js/googletranslate.js'
           ]
         }
       },
@@ -75,13 +78,13 @@ module.exports = function (grunt) {
         tasks: ['jshint', 'uglify']
       },
       sass: {
-        files: './public/sass/**.scss',
+        files: './public/sass/**/*.scss',
         tasks: ['compass']
       }
     },
     exec: {
       install_composer: {
-        cmd: 'composer install'
+        cmd: 'composer self-update && composer install --prefer-dist --no-interaction'
       },
       install_bower: {
         cmd: 'bower install'
@@ -92,26 +95,44 @@ module.exports = function (grunt) {
       vagrant_setup: {
         cmd: 'vagrant up'
       },
-      codeception: {
-        cmd: 'vendor/codeception/codeception/codecept build && vendor/codeception/codeception/codecept run'
-      }
-    },
-    db_dump: {
-      testing: {
-        options: (function () {
+      codeception_build: {
+        cmd: 'vendor/codeception/codeception/codecept build -q -n --force',
+        exitCode: [255, 1]
+      },
+      codeception_acceptance: {
+        cmd: 'vendor/codeception/codeception/codecept run --debug acceptance'
+      },
+      codeception_unit: {
+        cmd: 'vendor/codeception/codeception/codecept run unit'
+      },
+      create_testdb: {
+        cmd: function () {
           var creds = grunt.file.readYAML('codeception.yml');
-          var returned = {
-            title: "Dump for test suite",
-            database: creds.modules.config.Db.dsn.split('=')[2],
-            user: creds.modules.config.Db.user,
-            pass: creds.modules.config.Db.password,
-            host: creds.modules.config.Db.dsn.split('=')[1].replace(/;[\w]*/, ''),
-            backup_to: "tests/_data/dump.sql"
-          };
+          var database = creds.modules.config.Db.dsn.split('=')[2];
+          var user = creds.modules.config.Db.user;
+          var pass = (creds.modules.config.Db.password !== '' ? (' -p' + creds.modules.config.Db.password) : '');
+          // host: creds.modules.config.Db.dsn.split('=')[1].replace(/;[\w]*/, ''),
+          var command = 'mysqladmin -u' + user + pass + " create " + database;
+          return command;
+        }
+      },
+      migrate: {
+        cmd: "php artisan migrate"
+      },
+      seed: {
+        cmd: "php artisan db:seed"
+      },
+      drop_testdb: {
+        cmd: function () {
+          var creds = grunt.file.readYAML('codeception.yml');
+          var database = creds.modules.config.Db.dsn.split('=')[2];
+          var user = creds.modules.config.Db.user;
+          var pass = (creds.modules.config.Db.password !== '' ? (' -p' + creds.modules.config.Db.password) : '');
+          // host: creds.modules.config.Db.dsn.split('=')[1].replace(/;[\w]*/, ''),
+          return 'mysql -u' + user + pass + " -e 'DROP DATABASE IF EXISTS " + database + ";'";
+        }
+      },
 
-          return returned;
-        }())
-      }
     }
   });
 
@@ -121,12 +142,16 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-exec');
   grunt.loadNpmTasks('grunt-mysql-dump');
+  grunt.loadNpmTasks('grunt-selenium-webdriver');
 
   // Task definition
+  grunt.registerTask('build', ['jshint', 'uglify', 'compass']);
   grunt.registerTask('default', ['jshint', 'uglify', 'watch']);
-  grunt.registerTask('install', ['exec:install_composer', 'exec:install_bower', 'exec:install_npm']);
-  grunt.registerTask('test', ['db_dump:testing', 'exec:codeception']);
+  grunt.registerTask('install', ['exec:install_composer', 'exec:install_bower']);
+  grunt.registerTask('selenium', ['selenium_phantom_hub']);
+  grunt.registerTask('test', ['selenium_phantom_hub', 'exec:codeception_build', 'exec:codeception_acceptance', 'selenium_stop']);
+  grunt.registerTask('test_acceptance', ['exec:drop_testdb', 'exec:create_testdb', 'exec:migrate', 'exec:seed', 'selenium_phantom_hub', 'exec:codeception_build', 'exec:codeception_acceptance', 'selenium_stop', 'exec:drop_testdb']);
+  grunt.registerTask('test_unit', ['exec:drop_testdb', 'exec:create_testdb', 'exec:codeception_build', 'exec:codeception_unit', 'exec:drop_testdb']);
 };

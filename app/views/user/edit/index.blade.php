@@ -37,14 +37,23 @@
 					<!-- TODO: Organization -->
 					<!-- Location -->
 					<!-- TODO: autofill / check location exists -->
+					<!-- Password -->
+					<div class="form-group">
+						<label for="password_1">Change password:</label>
+						<input type="password" class="form-control" name="password_1" id="password_1" placeholder="New password" value=""/>
+					</div>
+					<div class="form-group">
+						<label for="password_2">Confirm password:</label>
+						<input type="password" class="form-control" name="password_2" id="password_2" placeholder="Repeat new password" value=""/>
+					</div>
 					<div class="checkbox">
 						@if(Auth::user()->verified())
 							<label>
-								<input name="verify" type="checkbox" checked disabled> Request 'Verified Account' is '{{ Auth::user()->verified() }}'
+								<input name="verify" id="verify" type="checkbox" checked disabled> Request 'Verified Account' is '{{ Auth::user()->verified() }}'
 							</label>
 						@else
 							<label>
-								<input name="verify" type="checkbox"> Request 'Verified Account'
+								<input name="verify" id="verify" type="checkbox"> Request 'Verified Account'
 							</label>
 						@endif
 					</div>
@@ -61,7 +70,7 @@
 						<!-- Change avatar at gravatar.com -->
 						<a href="https://gravatar.com" target="_blank" class="red">Change your avatar at Gravatar.com</a>
 					</div>
-					<button type="submit" class="btn btn-default">Submit</button>
+					<button type="submit" class="btn btn-default" id="submit">Submit</button>
 					{{ Form::token() }}
 				{{ Form::close() }}
 			</div>
