@@ -2,7 +2,7 @@
 	http://mymadison.io/css/style.css */
 
 @import "compass/css3/box-shadow";
-@import "compass/css3/shared";
+@import "compass/css3/deprecated-support";
 @import "compass/css3/border-radius";
 @import "compass/css3/box-shadow";
 @import "compass/layout/sticky-footer";
@@ -23,6 +23,8 @@
 @import "animations";
 @import "annotator";
 @import "socials";
+@import "tour";
+@import "directives";
 
 /* ==========================================================================
    Browse Happy prompt
@@ -141,6 +143,12 @@ textarea.form-inline{
 	color:$light-gray;
 }
 
+/* Glyphicons */
+
+.glyphicon.glyphicon-thumbs-up, .glyphicon.glyphicon-thumbs-down, .glyphicon.glyphicon-flag{
+	cursor: pointer;
+}
+
 /* MAIN HEADER
 ------------------------------ */
 .navbar {
@@ -222,6 +230,8 @@ textarea.form-inline{
 
 		.navbar-nav {
 			background-color: rgba(244,244,244,0.9);
+			z-index:1;
+			position:relative;
 
 			width: 100%;
 			text-align: center;

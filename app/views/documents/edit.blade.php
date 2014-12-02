@@ -53,6 +53,14 @@
 								</div>
 							</div>
 							<div class="form-group">
+								<label for="short-url" class="col-sm-2 control-label">Short Url:</label>
+								<div class="col-sm-10">
+									<button class="btn btn-default" ng-show="!short_url" ng-click="getShortUrl()">Get Short Url</button>
+									<input type="text" class="form-control" ng-show="short_url" ng-model="short_url">
+								</div>
+								
+							</div>
+							<div class="form-group">
 								<label for="status" class="col-sm-2 control-label">Status: </label>
 								<div class="col-sm-10 select2-full-width">
 									<input name="status" type="hidden" ui-select2="statusOptions" ng-model="status" ng-change="statusChange(status)">
@@ -68,6 +76,15 @@
 								<label for="categories" class="col-sm-2 control-label">Categories: </label>
 								<div class="col-sm-10 select2-full-width">
 									<input type="hidden" ui-select2="categoryOptions" ng-model="categories" ng-change="categoriesChange(categories)" />
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-2">
+									<label for="intro-text">Intro Text:</label>
+								</div>
+								<div class="col-sm-10">
+									<textarea class="form-control" rows="10" ng-model="introtext" ng-change="updateIntroText(introtext)"></textarea>
+									<span class="help-block">Markdown Friendly.  Auto-saves 3 seconds after you're done editing.</span>
 								</div>
 							</div>
 						</form>

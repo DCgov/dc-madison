@@ -22,6 +22,7 @@ Route::pattern('date', '[0-9]+');
 *   Route - Model bindings
 */
 Route::model('user', 'User');
+Route::model('user/edit', 'User');
 
 /*
 |--------------------------------------------------------------------------
@@ -77,6 +78,9 @@ Route::post('/documents/sponsor/request', 'SponsorController@postRequest');
 
 //User Routes
 Route::get('user/{user}', 'UserController@getIndex');
+Route::get('user/edit/{user}', 'UserController@getEdit');
+Route::put('user/edit/{user}', 'UserController@putEdit');
+Route::get('user/edit/{user}/notifications', 'UserController@editNotifications');
 Route::controller('user', 'UserController');
 
 //Password Routes
@@ -143,6 +147,8 @@ Route::controller('dashboard', 'DashboardController');
     Route::get('api/docs/sponsors', 'DocumentApiController@getAllSponsors');
     Route::get('api/docs/{doc}/categories', 'DocumentApiController@getCategories');
     Route::post('api/docs/{doc}/categories', 'DocumentApiController@postCategories');
+    Route::get('api/docs/{doc}/introtext', 'DocumentApiController@getIntroText');
+    Route::post('api/docs/{doc}/introtext', 'DocumentApiController@postIntroText');
     Route::get('api/docs/{doc}/sponsor/{sponsor}', 'DocumentApiController@hasSponsor');
     Route::get('api/docs/{doc}/sponsor', 'DocumentApiController@getSponsor');
     Route::post('api/docs/{doc}/sponsor', 'DocumentApiController@postSponsor');
@@ -166,7 +172,10 @@ Route::controller('dashboard', 'DashboardController');
     Route::post('api/user/admin/', 'UserApiController@postAdmin');
     Route::get('api/user/independent/verify/', 'UserApiController@getIndependentVerify');
     Route::post('api/user/independent/verify/', 'UserApiController@postIndependentVerify');
-    
+    Route::get('api/user/current', 'UserController@getCurrent');
+    Route::put('api/user/{user}/edit/email', 'UserController@editEmail');
+    Route::get('api/user/{user}/notifications', 'UserController@getNotifications');
+    Route::put('api/user/{user}/notifications', 'UserController@putNotifications');
     
     // Group Routes
     Route::get('api/groups/verify/', 'GroupsApiController@getVerify');

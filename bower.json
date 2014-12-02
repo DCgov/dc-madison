@@ -6,7 +6,10 @@
   },
   "devDependencies": {
     "pagedown": "~1.1.0",
+    "angular": "~1.2.16",
     "angular-ui": "~0.4.0",
+    "angular-animate": "~1.2.16",
+    "angular-bootstrap": "*",
     "angular-select2": "*",
     "angular-ui-select2": "~0.0.5",
     "bootstrap": "~3.1.1",
@@ -15,10 +18,15 @@
     "angular-sanitize": "~1.2.16",
     "angular-bootstrap-datetimepicker": "~0.2.2",
     "google-diff-match-patch-js": "~1.0.0",
-    "angular-resource": "~1.2.22"
+    "angular-resource": "~1.2.22",
+    "crypto-js": "http://crypto-js.googlecode.com/svn/tags/3.0.2/build/rollups/md5.js",
+    "google-translate": "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit",
+    "angular-tour": "~0.1.1",
+    "angular-route": "~1.2.24",
+    "angular-cookie": "~4.0.2"
   },
   "resolutions": {
-    "angular": "~1.2.22",
-    "bootstrap": "~3.2.0"
+    "select2": "~3.4",
+    "angular": "1.2.27"
   }
 }

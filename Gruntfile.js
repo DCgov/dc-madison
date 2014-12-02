@@ -3,7 +3,18 @@ module.exports = function (grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
-    // Task configuration
+    notify: {
+      uglify: {
+        options: {
+          message: 'Uglify complete.'
+        }
+      },
+      cssmin: {
+        options: {
+          message: "Cssmin complete."
+        }
+      }
+    },
     compass: {
       dist: {
         options: {
@@ -22,6 +33,7 @@ module.exports = function (grunt) {
         'proto': true
       },
       all: [
+        'public/js/bootstrap-tour.js',
         'public/js/controllers.js',
         'public/js/dashboardControllers.js',
         'public/js/services.js',
@@ -49,12 +61,31 @@ module.exports = function (grunt) {
             'public/bower_components/angular-growl/build/angular-growl.min.js',
             'public/bower_components/angular-sanitize/angular-sanitize.js',
             'public/bower_components/angular-resource/angular-resource.min.js',
+            'public/bower_components/angular-route/angular-route.min.js',
             'public/bower_components/bootstrap/dist/js/bootstrap.min.js',
+            'public/bower_components/pagedown/Markdown.Converter.js',
+            'public/bower_components/pagedown/Markdown.Sanitizer.js',
+            'public/bower_components/pagedown/Markdown.Editor.js',
+            'public/bower_components/crypto-js/index.js',
+            'public/bower_components/google-translate/index.txt',
+            'public/bower_components/bootstrap/js/collapse.js',
+            'public/bower_components/bootstrap/js/modal.js',
+            'public/bower_components/angular-tour/dist/angular-tour.min.js',
+            'public/bower_components/angular-tour/dist/angular-tour-tpls.min.js',
+            'public/bower_components/angular-cookie/angular-cookie.min.js',
 
             //Datetimepicker and dependencies
             'public/vendor/datetimepicker/datetimepicker.js',
             'public/bower_components/moment/min/moment.min.js',
             'public/bower_components/angular-bootstrap-datetimepicker/src/js/datetimepicker.js',
+
+            //Annotator JS
+            'public/vendor/annotator/annotator-full.min.js',
+            'public/vendor/showdown/showdown.js',
+            'public/js/annotator-madison.js',
+
+            //Custom JS
+            'public/js/bootstrap-tour.js',
             'public/js/controllers.js',
             'public/js/resources.js',
             'public/js/dashboardControllers.js',
@@ -68,18 +99,36 @@ module.exports = function (grunt) {
         }
       },
       options: {
-        mangle: false,
-        sourceMap: 'public/build/app.map'
+        mangle: false
+      }
+    },
+    cssmin: {
+      combine: {
+        files: {
+          'public/build/app.css': [
+            'public/bower_components/angular-tour/dist/angular-tour.css',
+            'public/bower_components/angular-growl/build/angular-growl.min.css',
+            'public/vendor/pagedown/assets/demo.css',
+            'public/vendor/datetimepicker/datetimepicker.css',
+            'public/vendor/jquery/jquery-ui-smoothness.css',
+            'public/vendor/bootstrap/css/bootstrap.min.css',
+            'public/vendor/bootstrap/css/bootstrap-theme.min.css',
+            'public/vendor/select2/select2.css',
+            'public/vendor/annotator/annotator.min.css',
+            'public/css/style.css',
+            'public/css/dropdown-sub.css'
+          ]
+        }
       }
     },
     watch: {
       scripts: {
         files: ['public/js/*.js', 'Gruntfile.js'],
-        tasks: ['jshint', 'uglify']
+        tasks: ['jshint', 'uglify', 'notify:uglify']
       },
       sass: {
-        files: './public/sass/**/*.scss',
-        tasks: ['compass']
+        files: './public/sass/*.scss',
+        tasks: ['compass', 'cssmin', 'notify:cssmin']
       }
     },
     exec: {
@@ -95,25 +144,19 @@ module.exports = function (grunt) {
       vagrant_setup: {
         cmd: 'vagrant up'
       },
-      codeception_build: {
-        cmd: 'vendor/codeception/codeception/codecept build -q -n --force',
-        exitCode: [255, 1]
-      },
-      codeception_acceptance: {
-        cmd: 'vendor/codeception/codeception/codecept run --debug acceptance'
-      },
-      codeception_unit: {
-        cmd: 'vendor/codeception/codeception/codecept run unit'
-      },
       create_testdb: {
         cmd: function () {
-          var creds = grunt.file.readYAML('codeception.yml');
-          var database = creds.modules.config.Db.dsn.split('=')[2];
-          var user = creds.modules.config.Db.user;
-          var pass = (creds.modules.config.Db.password !== '' ? (' -p' + creds.modules.config.Db.password) : '');
-          // host: creds.modules.config.Db.dsn.split('=')[1].replace(/;[\w]*/, ''),
-          var command = 'mysqladmin -u' + user + pass + " create " + database;
+          var database = "madison_grunt_test";
+          var user = "root";
+          var command = 'mysqladmin -u' + user + " create " + database;
           return command;
+        }
+      },
+      drop_testdb: {
+        cmd: function () {
+          var database = "madison_grunt_test";
+          var user = "root";
+          return 'mysql -u' + user + " -e 'DROP DATABASE IF EXISTS " + database + ";'";
         }
       },
       migrate: {
@@ -121,19 +164,56 @@ module.exports = function (grunt) {
       },
       seed: {
         cmd: "php artisan db:seed"
+      }
+    },
+    karma: {
+      unit: {
+        configFile: 'karma.conf.js'
+      }
+    },
+    protractor: {
+      options: {
+        configFile: "protractor.conf.js", // Default config file
+        keepAlive: false, // If false, the grunt process stops when the test fails.
+        noColor: false // If true, protractor will not use colors in its output.
       },
-      drop_testdb: {
-        cmd: function () {
-          var creds = grunt.file.readYAML('codeception.yml');
-          var database = creds.modules.config.Db.dsn.split('=')[2];
-          var user = creds.modules.config.Db.user;
-          var pass = (creds.modules.config.Db.password !== '' ? (' -p' + creds.modules.config.Db.password) : '');
-          // host: creds.modules.config.Db.dsn.split('=')[1].replace(/;[\w]*/, ''),
-          return 'mysql -u' + user + pass + " -e 'DROP DATABASE IF EXISTS " + database + ";'";
+      chrome: {
+        options: {
+          args: {
+            sauceUser: process.env.SAUCE_USERNAME,
+            sauceKey: process.env.SAUCE_ACCESS_KEY,
+            browser: "chrome"
+          }
         }
       },
-
-    }
+      firefox: {
+        options: {
+          args: {
+            sauceUser: process.env.SAUCE_USERNAME,
+            sauceKey: process.env.SAUCE_ACCESS_KEY,
+            browser: "firefox"
+          }
+        }
+      },
+      ie: {
+        options: {
+          args: {
+            sauceUser: process.env.SAUCE_USERNAME,
+            sauceKey: process.env.SAUCE_ACCESS_KEY,
+            browser: "internet explorer"
+          }
+        }
+      },
+      safari: {
+        options: {
+          args: {
+            sauceUser: process.env.SAUCE_USERNAME,
+            sauceKey: process.env.SAUCE_ACCESS_KEY,
+            browser: "safari"
+          }
+        }
+      }
+    },
   });
 
   // Plugin loading
@@ -144,14 +224,19 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-exec');
   grunt.loadNpmTasks('grunt-mysql-dump');
-  grunt.loadNpmTasks('grunt-selenium-webdriver');
+  grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('grunt-protractor-runner');
+  grunt.loadNpmTasks('grunt-contrib-connect');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-notify');
 
   // Task definition
-  grunt.registerTask('build', ['jshint', 'uglify', 'compass']);
-  grunt.registerTask('default', ['jshint', 'uglify', 'watch']);
-  grunt.registerTask('install', ['exec:install_composer', 'exec:install_bower']);
-  grunt.registerTask('selenium', ['selenium_phantom_hub']);
-  grunt.registerTask('test', ['selenium_phantom_hub', 'exec:codeception_build', 'exec:codeception_acceptance', 'selenium_stop']);
-  grunt.registerTask('test_acceptance', ['exec:drop_testdb', 'exec:create_testdb', 'exec:migrate', 'exec:seed', 'selenium_phantom_hub', 'exec:codeception_build', 'exec:codeception_acceptance', 'selenium_stop', 'exec:drop_testdb']);
-  grunt.registerTask('test_unit', ['exec:drop_testdb', 'exec:create_testdb', 'exec:codeception_build', 'exec:codeception_unit', 'exec:drop_testdb']);
+  grunt.registerTask('build', ['jshint', 'uglify', 'notify:uglify', 'compass', 'cssmin', 'notify:cssmin']);
+  grunt.registerTask('default', ['jshint', 'uglify', 'notify:uglify', 'compass', 'cssmin', 'notify:cssmin', 'watch']);
+  grunt.registerTask('install', ['exec:install_composer']);
+  grunt.registerTask('test_setup', ['exec:drop_testdb', 'exec:create_testdb', 'exec:migrate', 'exec:seed']);
+  grunt.registerTask('test_chrome', ['test_setup', 'protractor:chrome']);
+  grunt.registerTask('test_firefox', ['test_setup', 'protractor:firefox']);
+  grunt.registerTask('test_ie', ['test_setup', 'protractor:ie']);
+  grunt.registerTask('test_safari', ['test_setup', 'protractor:safari']);
 };

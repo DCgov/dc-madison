@@ -11,7 +11,9 @@ class DocumentApiController extends ApiController{
 	}
 
 	public function getDoc($doc){
-		$doc = Doc::with('content')->with('categories')->find($doc);
+		$doc_id = $doc;
+
+		$doc = Doc::with('content')->with('categories')->with('introtext')->find($doc);
 
 		return Response::json($doc);
 	}
@@ -63,11 +65,11 @@ class DocumentApiController extends ApiController{
 		$return_docs = array();
 
 		foreach($docs as $doc){
-			try { 
-				$doc->setActionCount();
-			} catch(Exception $e) {
-				throw $e;
-			}
+			// try { 
+			// 	$doc->setActionCount();
+			// } catch(Exception $e) {
+			// 	throw $e;
+			// }
 			
 			$return_doc = $doc->toArray();
 
@@ -131,6 +133,32 @@ class DocumentApiController extends ApiController{
 		return Response::json($response);
 	}
 
+	public function getIntroText($doc){
+		$introText = DocMeta::where('meta_key', '=', 'intro-text')->where('doc_id', '=', $doc)->first();
+
+		return Response::json($introText);
+	}
+
+	public function postIntroText($doc){
+
+		$introText = DocMeta::where('meta_key', '=', 'intro-text')->where('doc_id', '=', $doc)->first();
+
+		if(!$introText){
+			$introText = new DocMeta();
+			$introText->doc_id = $doc;
+			$introText->meta_key = 'intro-text';
+		}
+
+		$text = Input::get('intro-text');
+		$introText->meta_value = $text;
+
+		$introText->save();
+
+		$response['messages'][0] = array('text' => 'Intro Text Saved.', 'severity' => 'info');
+		
+		return Response::json($response);
+	}
+
 	public function hasSponsor($doc, $sponsor){
 		$result = Doc::find($doc)->sponsor()->find($sponsor);
 		return Response::json($result);
@@ -141,9 +169,14 @@ class DocumentApiController extends ApiController{
 		$doc = Doc::find($doc);
 		$sponsor = $doc->sponsor()->first();
 
-		$sponsor->sponsorType = get_class($sponsor);
+		if($sponsor){
+			$sponsor->sponsorType = get_class($sponsor);	
 
-		return Response::json($sponsor);
+			return Response::json($sponsor);
+		}
+		
+		return Response::json();
+		
 	}
 
 	public function postSponsor($doc){

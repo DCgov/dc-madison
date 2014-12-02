@@ -25,12 +25,6 @@
 			$.showAnnotationThanks = false;
 		@endif
 	</script>
-	{{ HTML::style('vendor/annotator/annotator.min.css') }}
-	{{ HTML::script('vendor/annotator/annotator-full.min.js') }}
-	{{ HTML::script('vendor/showdown/showdown.js') }}
-	{{ HTML::script('bower_components/bootstrap/js/collapse.js') }}
-	{{ HTML::script('bower_components/bootstrap/js/modal.js') }}
-	{{ HTML::script('js/annotator-madison.js') }}
 	{{ HTML::script('js/doc.js') }}
 
 <div class="modal fade" id="annotationThanks" tabindex="-1" role="dialog" aria-labelledby="annotationThanks" aria-hidden="true">
@@ -54,6 +48,10 @@
 				</div>
 				<div class="doc-date" ng-repeat="date in doc.dates">
 					<strong>@{{ date.label }}: </strong><span>@{{ date.date | parseDate | date:'shortDate' }}</span>
+				</div>
+				<div class="doc-intro" ng-if="introtext">
+					<p><strong>Introduction:</strong></p>
+					<div class="markdown" data-ng-bind-html="introtext"></div>
 				</div>
 				<div class="btn-group">
 						<a id="doc-support" href="#" class="btn btn-default doc-support" ng-click="support(true, $event)" ng-class="{'btn-success': supported}">Support This Document</a>
@@ -84,7 +82,7 @@
 			</div>
 		</div>
 	</div>
-	<ul class="nav nav-tabs" role="tablist">
+	<ul class="nav nav-tabs" role="tablist" tourtip="@{{ step_messages.step_3 }}" tourtip-step="3">
 		<li ng-class="{'active':secondtab == false}"><a href="#tab-activity" target="_self" role="tab" data-toggle="tab">Bill</a></li>
 		<li ng-class="{'active':secondtab == true}"><a href="#tab-discussion" target="_self" role="tab" data-toggle="tab">Discussion</a></li>
 		<a href="{{ $doc->slug }}/feed" class="rss-link" target="_self"><img src="/img/rss-fade.png" class="rss-icon" alt="RSS Icon"></a>
@@ -108,8 +106,8 @@
 				</div>
 			</div>
 			<div class="col-md-6">
-				<div id="content" class="content doc_content @if(Auth::check())logged_in@endif">
-					<div id="doc_content">{{ $doc->get_content('html') }}</div>
+				<div id="content" class="content doc_content @if(Auth::check())logged_in@endif" tourtip="@{{ step_messages.step_2 }}" tourtip-step="2">
+					<div id="doc_content" tourtip="@{{ step_messages.step_4 }}" tourtip-step="4">{{ $doc->get_content('html') }}</div>
 				</div>
 			</div>
 			<div class="col-md-3">

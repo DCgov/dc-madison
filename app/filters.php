@@ -14,7 +14,7 @@ use Zizaco\Entrust\Entrust;
 
 App::before(function($request)
 {
-	//
+	Request::setTrustedProxies([$request->getClientIP()]);
 });
 
 
