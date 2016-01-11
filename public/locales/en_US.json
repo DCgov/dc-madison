@@ -1,6 +1,6 @@
 {
-  "site.name": "MyMadison",
-  "site.name.full": "MyMadison<span class=\"dot-io\">.io</span>",
+  "site.name": "Drafts.dc.gov",
+  "site.name.full": "Drafts<span class=\"dot-io\">.dc.gov</span>",
 
   "menu.nav.home": "Home",
   "menu.nav.about": "About",
@@ -27,7 +27,7 @@
   "menu.admin.nav.notifications": "Administrative Notification Settings",
   "menu.admin.nav.settings": "Site Settings",
 
-  "footer.tagline": "<ul class=\"for-roles\"><li>for <span class=\"for-role\">Citizens</span></li><li>for <span class=\"for-role\">Authors</span></li><li>for <span class=\"for-role\">Developers</span></li></ul>",
+  "footer.tagline": "<ul class=\"for-roles\"><li>for <span class=\"for-role\">Residents</span></li><li>for <span class=\"for-role\">Authors</span></li><li>for <span class=\"for-role\">Developers</span></li></ul>",
 
   "info.message.outdatedbrowser": "You are using an <strong>outdated</strong> browser. Please <a href=\"http://browsehappy.com/\" target=\"_blank\">upgrade your browser</a> to improve your experience.",
 
