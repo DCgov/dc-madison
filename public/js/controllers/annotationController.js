@@ -13,6 +13,10 @@ angular.module('madisonApp.controllers')
       $scope.annotationsShow = false;
       $scope.currentGroup = null;
 
+      setTimeout(function() {
+        $('.annotation-help').tooltip({});
+      }, 1000);
+
       //Parse sub-comment hash if there is one
       var hash = $location.hash();
 

@@ -228,6 +228,7 @@
   "document.label.comments": "Comments",
 
   "annotations.label.none": "No annotations yet. Add your own by highlighting the text you want to annotate!",
+  "annotations.label.help": "Highlight some text to add your own annotations.",
   "annotations.label.count": "{{count}}",
   "annotations.label.collaborators": "{count} {count, plural, one{collaborator} other{collaborators}}",
   "annotations.label.comments": "{count} {count, plural, one{comment} other{comments}}",
