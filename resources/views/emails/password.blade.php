@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 	</head>
 	<body>
-		<h2>Madison Password Reset</h2>
+		<h2>Drafts.dc.gov Password Reset</h2>
 
 		<div>
 			To reset your password, complete this form: {{ url('password/reset/' . $token) }}.
