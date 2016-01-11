@@ -8,6 +8,6 @@
 		<p>A comment has been added to - {{ link_to('docs/' . $doc['slug'], $doc['title']) }}</p>
     <blockquote>{{ $comment['text'] }}</blockquote>
 
-		<p>&ndash; The OpenGov Foundation Team</p>
+		<p>&ndash; The Drafts.dc.gov Team</p>
 	</body>
 </html>

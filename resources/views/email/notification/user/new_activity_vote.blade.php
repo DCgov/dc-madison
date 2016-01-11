@@ -20,6 +20,6 @@ Expects:
 
     <p>If you want to turn off vote notifications, please visit your <a href="{{ URL::to('/user/edit/' . $activity['user']['id'] . '/notifications') }}">Notification Settings Page</a></p>
 
-    <p>&ndash; The OpenGov Foundation Team</p>
+    <p>&ndash; The Drafts.dc.gov Team</p>
   </body>
 </html>
