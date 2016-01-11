@@ -11,6 +11,6 @@
       <p>{{ $annotation['quote'] }}</p>
     </blockquote>
 
-		<p>&ndash; The OpenGov Foundation Team</p>
+		<p>&ndash; The Drafts.dc.gov Team</p>
 	</body>
 </html>

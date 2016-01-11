@@ -12,6 +12,6 @@
 
     Jump back over to <a href="{{ $subcomment['link'] }}">the conversation</a> to respond!
 
-    <p>&ndash; The OpenGov Foundation Team</p>
+    <p>&ndash; The Drafts.dc.gov Team</p>
   </body>
 </html>
