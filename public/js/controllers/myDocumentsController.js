@@ -33,9 +33,15 @@ angular.module('madisonApp.controllers')
         for(var i = 0; i < SessionService.groups.length; i++) {
           var group = SessionService.groups[i];
           if(group.status === 'active') {
-          console.log(group.name, group.status);
             $scope.groupOptions.push([group.id, group.name]);
           }
+        }
+
+        if($scope.independent_sponsor) {
+          $scope.newDoc.group_id = '';
+        }
+        else if($scope.groupOptions.length) {
+          $scope.newDoc.group_id = $scope.groupOptions[0][0];
         }
 
         $scope.$on('docsChanged', function () {

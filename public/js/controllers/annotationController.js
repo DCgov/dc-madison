@@ -170,7 +170,6 @@ angular.module('madisonApp.controllers')
         var currentId = $scope.user.id;
         var sponsored = false;
         // angular.forEach($scope.doc.sponsor, function (sponsor) {
-        //   console.log(sponsor);
         //   if (currentId === sponsor.id) {
         //     sponsored = true;
         //   }
@@ -193,21 +192,6 @@ angular.module('madisonApp.controllers')
         // Leaving this function in case we want to implement a more complex
         // ordering algorithm in the future
         return activity.likes;
-      };
-
-      $scope.addAction = function (activity, action, $event) {
-        if ($scope.user && $scope.user.id !== '') {
-          $http.post('/api/docs/' + $scope.doc.id + '/' + activity.label + 's/' + activity.id + '/' + action)
-            .success(function (data) {
-              activity.likes = data.likes;
-              activity.flags = data.flags;
-            }).error(function (data) {
-              console.error(data);
-            });
-        } else {
-          loginPopupService.showLoginForm($event);
-        }
-
       };
 
       $scope.collapseComments = function (activity) {
