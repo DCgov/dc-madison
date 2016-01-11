@@ -1,3 +1,7 @@
 /* Defaults for DC */
 
 $blue: #2B4888;
+
+.faq h2 {
+    @extend .medium-heading;
+}
