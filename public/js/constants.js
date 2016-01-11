@@ -80,5 +80,5 @@ angular.module('madisonApp.constants', [])
     }
   })
   .constant('SITE', {
-    name: 'Madison'
+    name: 'Drafts.dc.gov'
   });
