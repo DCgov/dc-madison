@@ -1,9 +1,9 @@
 .prompts {
     position:relative;
     $prompt-height: 2.5 * $line-height-computed;
-    background-color: $blue;
+    background-color: $lighter-grey;
     text-align: center;
-    color: $white;
+    color: $black;
 
     margin-bottom: $line-height-computed;
 
@@ -14,7 +14,7 @@
     }
 
     a {
-        color: $white;
+        color: $blue;
         text-decoration: underline;
         &:hover {
             text-decoration: none;
