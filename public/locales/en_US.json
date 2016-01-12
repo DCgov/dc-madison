@@ -173,7 +173,7 @@
   "form.admindocument.submit": "Create Document",
 
   "home.intro.title": "DC needs your voice!",
-  "home.intro.text": "<p>Get informed about legislation, regulations and other policies being developed by DC Government. Then get involved and collaborate with government to craft policy that works for our entire community. You can support or oppose documents, provide comments, and even annotate the parts that matter most to you.</p>",
+  "home.intro.text": "<p>Get informed about legislation, regulations and other policies being developed by DC Government. Then get involved and collaborate with government to craft policy that works for our entire community. You can support or oppose documents, provide comments, and even annotate the parts that matter to you.</p><p>This site is in beta. Please <a href='mailto:digitalservice@dc.gov'>email us</a> with feedback or questions, or help us develop the site on <a href='https://github.com/DCgov/dc-madison'>GitHub</a>.</p>",
 
   "document.interface.readmore": "Read More",
   "document.interface.readmoretitle": "Read more of {{title}}",
