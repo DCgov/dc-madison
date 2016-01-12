@@ -1,7 +1,6 @@
 # Madison
 
-[![Build Status](https://api.travis-ci.org/opengovfoundation/madison.svg?branch=master)](https://travis-ci.org/opengovfoundation/madison)
-[![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/opengovfoundation/madison.svg)](https://scrutinizer-ci.com/g/opengovfoundation/madison?branch=master)
+[![Build Status](https://api.travis-ci.org/DCgov/dc-madison.svg?branch=master)](https://travis-ci.org/DCgov/dc-madison)
 
 Madison is the open-source, collaborative document editing platform that powers [drafts.dc.gov](https://drafts.dc.gov).
 
