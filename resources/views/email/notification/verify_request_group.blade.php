@@ -18,6 +18,6 @@
 
     <a href="{{ URL::to('dashboard/groupverifications') }}">View Request</a>
 
-	<p>&ndash; The OpenGov Foundation Team</p>
+	<p>&ndash; The Drafts.dc.gov Team</p>
 	</body>
 </html>

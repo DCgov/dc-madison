@@ -9,6 +9,6 @@
 
         <p><a href="{{ URL::to('administrative-dashboard/verify-account') }}#request-{{ $request['id'] }}">View Request</a></p>
 
-		<p>&ndash; The OpenGov Foundation Team</p>
+		<p>&ndash; The Drafts.dc.gov Team</p>
 	</body>
 </html>

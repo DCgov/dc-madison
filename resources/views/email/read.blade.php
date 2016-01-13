@@ -34,6 +34,6 @@
 
 		<a href="{{ url('docs/' . $slug, $parameters = array(), $secure = null) }}">Jump back in to the conversation</a>
 
-		<p>&ndash; The OpenGov Foundation Team</p>
+		<p>&ndash; The Drafts.dc.gov Team</p>
 	</body>
 </html>

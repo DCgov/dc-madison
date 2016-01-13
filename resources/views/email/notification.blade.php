@@ -4,8 +4,8 @@
 		<meta charset="utf-8" />
 	</head>
 	<body>
-		<h1>Just a quick note..</h1>
+		<h1>Just a quick note...</h1>
 		<p>{{ $text }} </p>
-		<p> &nbsp;&ndash; Your friends at <a href="{{ url('/', $parameters = array(), $secure = null) }}">Madison</a>.</p>
+		<p>&ndash; The Drafts.dc.gov Team</p>
 	</body>
 </html>
