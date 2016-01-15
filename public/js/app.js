@@ -224,7 +224,24 @@ angular.element(document).ready(function () {
           angular.bootstrap(document, ['madisonApp']);
         });
     });
+
+    $(document).delegate(
+      '.nav-main li a:not(.dropdown-trigger)',
+      'click',
+      collapseNavMenu);
+
+    $(document).delegate(
+      '.link-home',
+      'click',
+      collapseNavMenu);
+
+    function collapseNavMenu() {
+      if ($('.navbar-collapse').attr('aria-expanded') === 'true') {
+        $('.navbar-collapse').collapse('hide');
+      }
+    }
 });
+
 
 window.console = window.console || {};
 window.console.log = window.console.log || function () {return; };

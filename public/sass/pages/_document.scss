@@ -108,7 +108,7 @@
     }
 
     .stats-number {
-        @extend .col-md-8;
+        @extend .col-xs-8;
     }
 }
 
@@ -170,7 +170,7 @@
 }
 
 .chart-stat {
-    @extend .col-md-12;
+    @extend .col-xs-12;
 
     &.oppose {
         text-align: right;
@@ -422,6 +422,14 @@ $fallback-height: 350px;
     }
 }
 
+// Remove TOC on small screens.
+
+@media only screen and (max-width: $screen-sm-min) {
+    .toc {
+        display: none;
+    }
+}
+
 .toc-content {
     // Leave room for the navbars.
     width: $toc-width - 10px;
@@ -480,5 +488,43 @@ $fallback-height: 350px;
         @extend .small-caps;
         color: $blue;
         margin-right: 10px;
+    }
+}
+
+@media only screen and (max-width: $screen-sm-min) {
+    .doc-info .heading {
+        font-size: 2.0625rem;
+        line-height: 2 * $line-height-computed;
+    }
+
+    .single-doc {
+        .support-oppose-buttons {
+            float: none;
+        }
+        .stats {
+            padding-top: $padding-base-vertical;
+        }
+    }
+
+    .doc-content {
+        max-width: 100%;
+
+        blockquote {
+            margin-left: 5px;
+            padding-left: 5px;
+        }
+    }
+
+    .doc-secondary-content {
+        .stats-number {
+            width: 100%;
+            margin-bottom: 0;
+        }
+        .stat-value,
+        .stat-label {
+            font-size: $font-size-base;
+            text-transform: inherit;
+            display: inline-block;
+        }
     }
 }
