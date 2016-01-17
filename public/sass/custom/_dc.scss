@@ -2,6 +2,33 @@
 
 $blue: #2B4888;
 
-.faq h2 {
-    @extend .medium-heading;
+.madison {
+    .faq h2 {
+        @extend .medium-heading;
+    }
+
+    .annotation-pane .close-button {
+        color: $white;
+    }
+
+    .navbar {
+        background-color: $blue;
+    }
+
+    .dot-io {
+        color: $light-grey;
+    }
+
+    .prompts {
+        background-color: $lighter-grey;
+        color: $black;
+
+        a {
+            color: $blue;
+        }
+    }
+
+    .footer {
+        background-color: $blue;
+    }
 }

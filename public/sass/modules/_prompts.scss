@@ -2,9 +2,9 @@
     position:relative;
     $prompt-height: 2.5 * $line-height-computed;
     $prompt-font-size: 1.4rem;
-    background-color: $lighter-grey;
+    background-color: $blue;
     text-align: center;
-    color: $black;
+    color: $white;
 
     margin-bottom: $line-height-computed;
 
@@ -18,7 +18,7 @@
     }
 
     a {
-        color: $blue;
+        color: $white;
         text-decoration: underline;
         &:hover {
             text-decoration: none;
