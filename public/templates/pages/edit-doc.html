@@ -112,8 +112,12 @@
         </div>
         <div class="form-group">
           <label for="sponsor" translate="form.document.sponsor.label"></label>
-          <input type="hidden" ui-select2="sponsorOptions" ng-model="sponsor"
-            ng-change="sponsorChange(sponsor)" id="sponsor">
+          <select ng-model="sponsor" ng-change="sponsorChange(sponsor)" id="sponsor"
+            ng-options="sponsorOpt as sponsorOpt.text for sponsorOpt in sponsorOptions track by sponsorOpt.id">
+            <!--<option value="" translate="form.document.sponsor.placeholder"></option>-->
+          </select>
+          <!--<input type="hidden" ui-select2="sponsorOptions" ng-model="sponsor"-->
+          <!--  ng-change="sponsorChange(sponsor)" id="sponsor">-->
         </div>
         <div class="form-group">
           <label for="categories" translate="form.document.category.label"></label>
@@ -144,6 +148,12 @@
             <img ng-src="{{ featuredImage.path }}" class="img-responsive"
               alt="{{ 'form.document.image.title' | translate }}">
           </article>
+        </div>
+        <div class="form-group delete-document">
+            <button class="delete-document-button" ng-click="deleteDocument()"
+              translate="form.document.delete"></button>
+            <button ng-if="user.admin" class="delete-document-button"
+              ng-click="deleteDocument(true)" translate="form.document.delete.admin"></button>
         </div>
       </form>
       <div class="document-dates">
