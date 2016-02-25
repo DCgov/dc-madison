@@ -13,7 +13,7 @@ angular.module('madisonApp.controllers')
       $scope.annotationsShow = false;
       $scope.currentGroup = null;
 
-      setTimeout(function() {
+      $timeout(function() {
         $('.annotation-help').tooltip({});
       }, 1000);
 
