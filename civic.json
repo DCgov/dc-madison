@@ -9,6 +9,10 @@
     {
       "name": "OpenGovFoundation",
       "url": "http://opengovfoundation.org/"
+    },
+    {
+      "name": "OCTO Innovation Program",
+      "email": "open@dc.gov"
     }
   ],
   "description": "Washington DC's instance of the Madison platform. It powers drafts.dc.gov, a site that lets the public comment on and annotate District policy and legislation.",
