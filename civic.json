@@ -18,7 +18,7 @@
   "description": "Washington DC's instance of the Madison platform. It powers drafts.dc.gov, a site that lets the public comment on and annotate District policy and legislation.",
   "type": "Web App",
   "license": "GPL-3.0",
-  "homepage": "drafts.dc.gov",
+  "homepage": "https://drafts.dc.gov",
   "repository": "https://github.com/dcgov/dc-madison",
   "geography": [
     "Washington, DC"
