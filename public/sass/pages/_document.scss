@@ -284,6 +284,10 @@
     &.highlight {
         background-color: lighten($yellow, 30%);
     }
+
+    .activity-actions {
+        display: none;
+    }
 }
 
 .comment-body {

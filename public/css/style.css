@@ -5439,6 +5439,10 @@ label .required {
   background-color: #fff48c;
 }
 
+.comment .activity-actions {
+  display: none;
+}
+
 .comment-body.highlight {
   background-color: #fff48c;
 }
